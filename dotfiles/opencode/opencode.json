@@ -1,0 +1,298 @@
+{
+	"$schema": "https://opencode.ai/config.json",
+	"autoupdate": "notify",
+	"share": "manual",
+	"snapshot": true,
+	"model": "anthropic/claude-sonnet-4-5",
+	"small_model": "anthropic/claude-haiku-4-5",
+	"enabled_providers": [
+		"anthropic",
+		"azure",
+		"azure-cognitive-services",
+		"azure-foundry-base-models",
+		"openrouter"
+	],
+	"provider": {
+		"anthropic": {
+			"options": {
+				"apiKey": "{env:ANTHROPIC_API_KEY}",
+				"timeout": 600000,
+				"chunkTimeout": 45000,
+				"setCacheKey": true
+			}
+		},
+	"azure": {
+		"options": {
+			"apiKey": "{env:AZURE_OPENAI_API_KEY}",
+			"resourceName": "{env:AZURE_RESOURCE_NAME}",
+			"timeout": 600000
+		}
+	},
+	"azure-foundry-base-models": {
+		"name": "Azure Foundry Base Models",
+		"npm": "@ai-sdk/openai-compatible",
+		"options": {
+			"baseURL": "https://swedencentral.api.cognitive.microsoft.com/openai/v1",
+			"apiKey": "{env:AZURE_OPENAI_API_KEY}",
+			"useCompletionUrls": true
+		},
+		"models": {
+			"grok-4-20-reasoning": {
+				"name": "Grok 4.20 Reasoning",
+				"limit": {
+					"output": 10000,
+					"context": 131072
+				}
+			}
+		}
+	},
+	"azure-cognitive-services": {
+		"npm": "@ai-sdk/openai-compatible",
+		"options": {
+			"baseURL": "https://swedencentral.api.cognitive.microsoft.com/openai/v1",
+			"apiKey": "{env:AZURE_OPENAI_API_KEY}",
+			"useCompletionUrls": true
+		},
+	"models": {
+		"grok-4-20-reasoning": {
+			"name": "Grok 4.20 Reasoning",
+			"limit": {
+				"output": 10000,
+				"context": 131072
+			}
+		},
+		"claude-opus-4-6": {
+			"name": "Claude Opus 4.6",
+			"limit": {
+				"output": 16000,
+				"context": 1000000
+			}
+		},
+		"claude-sonnet-4-6": {
+			"name": "Claude Sonnet 4.6",
+			"limit": {
+				"output": 16000,
+				"context": 1000000
+			}
+		},
+		"claude-haiku-4-5": {
+			"name": "Claude Haiku 4.5",
+			"limit": {
+				"output": 16000,
+				"context": 200000
+			}
+		}
+	}
+	},
+		"openrouter": {
+			"options": {
+				"apiKey": "{env:OPENROUTER_API_KEY}",
+				"timeout": 600000
+			}
+		}
+	},
+	"permission": {
+		"edit": "allow",
+		"webfetch": "allow",
+		"skill": {
+			"*": "allow"
+		},
+		"todowrite": "allow",
+		"bash": {
+			"*": "ask",
+			"pwd": "allow",
+			"ls*": "allow",
+			"cat *": "allow",
+			"rg *": "allow",
+			"grep *": "allow",
+			"find *": "allow",
+			"git status*": "allow",
+			"git diff*": "allow",
+			"git log*": "allow",
+			"git show*": "allow",
+			"pnpm *": "allow",
+			"rm -rf *": "deny",
+			"sudo *": "deny",
+			"curl *|sh*": "deny"
+		},
+		"ralphloop_*": "ask",
+		"azure_devops_*": "ask",
+		"github_projects_*": "allow",
+		"azure_*": "ask"
+	},
+	"formatter": {
+		"biome": {
+			"disabled": false
+		},
+		"prettier": {
+			"disabled": false
+		},
+		"sql-formatter": {
+			"command": [
+				"npx",
+				"-y",
+				"sql-formatter",
+				"-w",
+				"$FILE"
+			],
+			"extensions": [
+				".sql"
+			]
+		}
+	},
+	"watcher": {
+		"ignore": [
+			"**/.git/**",
+			"**/node_modules/**",
+			"**/dist/**",
+			"**/build/**",
+			"**/.next/**",
+			"**/.turbo/**",
+			"**/coverage/**"
+		]
+	},
+	"mcp": {
+		"context7": {
+			"type": "remote",
+			"url": "https://mcp.context7.com/mcp",
+			"enabled": true,
+			"headers": {
+				"CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+			}
+		},
+		"gh_grep": {
+			"type": "remote",
+			"url": "https://mcp.grep.app",
+			"enabled": true
+		},
+		"github_projects": {
+			"type": "local",
+			"command": ["npx", "-y", "@joaodotwork/plantas-github-projects-mcp"],
+			"enabled": true,
+			"environment": {
+				"GITHUB_TOKEN": "{env:GITHUB_TOKEN}"
+			}
+		},
+		"azure": {
+			"type": "local",
+			"command": ["npx", "-y", "@azure/mcp@latest", "server", "start"],
+			"enabled": false,
+			"timeout": 30000
+		},
+		"sentry": {
+			"type": "remote",
+			"url": "https://mcp.sentry.dev/mcp",
+			"enabled": false,
+			"oauth": {}
+		},
+		"azure_devops": {
+			"type": "remote",
+			"url": "{env:AZURE_DEVOPS_MCP_URL}",
+			"enabled": false,
+			"oauth": false,
+			"headers": {
+				"Authorization": "Bearer {env:AZURE_DEVOPS_PAT}"
+			}
+		},
+		"ralphloop": {
+			"type": "remote",
+			"url": "{env:RALPHLOOP_MCP_URL}",
+			"enabled": false,
+			"oauth": false,
+			"headers": {
+				"Authorization": "Bearer {env:RALPHLOOP_API_KEY}"
+			}
+		}
+	},
+	"tools": {
+		"sentry_*": false
+	},
+	"agent": {
+		"swarm-orchestrator": {
+			"description": "Coordinates specialized subagents for full-stack delivery with controlled task fan-out.",
+			"mode": "primary",
+			"model": "anthropic/claude-sonnet-4-5",
+			"temperature": 0.2,
+			"steps": 12,
+			"permission": {
+				"task": {
+					"*": "deny",
+					"frontend-designer": "allow",
+					"backend-engineer": "allow",
+					"sql-engineer": "allow",
+					"azure-operator": "allow",
+					"mcp-integrator": "allow",
+					"explore": "allow",
+					"general": "allow"
+				}
+			}
+		},
+		"frontend-designer": {
+			"description": "Designs and implements production-grade web UI with accessibility and performance focus.",
+			"mode": "subagent",
+			"model": "anthropic/claude-sonnet-4-5",
+			"temperature": 0.55,
+			"steps": 10
+		},
+		"backend-engineer": {
+			"description": "Implements TypeScript backend services, APIs, tests, and observability.",
+			"mode": "subagent",
+			"model": "anthropic/claude-sonnet-4-5",
+			"temperature": 0.25,
+			"steps": 10
+		},
+		"sql-engineer": {
+			"description": "Designs schemas, writes migrations, and optimizes SQL query plans safely.",
+			"mode": "subagent",
+			"model": "anthropic/claude-sonnet-4-5",
+			"temperature": 0.2,
+			"steps": 8
+		},
+		"azure-operator": {
+			"description": "Handles Azure architecture, IaC, deployment checks, and operational diagnostics.",
+			"mode": "subagent",
+			"model": "anthropic/claude-sonnet-4-5",
+			"temperature": 0.2,
+			"steps": 8,
+			"permission": {
+				"webfetch": "allow",
+				"bash": {
+					"*": "ask",
+					"az *": "allow"
+				}
+			}
+		},
+		"mcp-integrator": {
+			"description": "Configures and troubleshoots MCP servers, auth, and tool routing.",
+			"mode": "subagent",
+			"model": "anthropic/claude-sonnet-4-5",
+			"temperature": 0.2,
+			"steps": 8,
+			"permission": {
+				"context7_*": "allow",
+				"gh_grep_*": "allow",
+				"sentry_*": "ask",
+				"azure_devops_*": "ask",
+				"ralphloop_*": "ask"
+			}
+		}
+	},
+	"command": {
+		"ts-refactor": {
+			"description": "Refactor TypeScript module with tests and zero type regressions",
+			"template": "Refactor $ARGUMENTS in TypeScript. Keep behavior stable, improve naming/structure, and run focused tests and typecheck. Return a concise diff summary and risks."
+		},
+		"backend-hardening": {
+			"description": "Harden backend API endpoints and error handling",
+			"template": "Audit and improve backend API robustness for $ARGUMENTS. Cover validation, authz/authn, error contracts, logging, and tests."
+		},
+		"sql-review": {
+			"description": "Review and optimize SQL for correctness and performance",
+			"template": "Review SQL in $ARGUMENTS for correctness, indexes, cardinality, and query plan risks. Propose safe migrations and rollout notes."
+		},
+		"mcp-audit": {
+			"description": "Audit MCP configuration and tool permissions",
+			"template": "Audit configured MCP servers, auth status, token usage, and permission boundaries. Recommend minimal-risk settings and context-efficient defaults."
+		}
+	}
+}

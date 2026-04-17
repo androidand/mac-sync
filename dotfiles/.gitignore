@@ -12,6 +12,15 @@ claude/**/*.key
 !**/.env.example
 
 # ============================================================================
+# OpenCode build artifacts — installed locally per machine, never sync
+# ============================================================================
+opencode/node_modules/
+opencode/package.json
+opencode/package-lock.json
+opencode/bun.lock
+opencode/.gitignore
+
+# ============================================================================
 # EPHEMERAL / per-machine Claude Code state — don't sync across Macs
 # ============================================================================
 claude/projects/
