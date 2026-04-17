@@ -38,21 +38,32 @@ merge_json() {
 	# We implement this with a jq program that emits BOTH a merged value
 	# and a list of conflict paths. On conflicts, we prompt once per path.
 
+	# We avoid `//` (which treats false/0/"" as absent) and use `if has then
+	# .[k] else null end` so genuine falsy values round-trip correctly.
+	# Arrays are merged by appending src items not already in dst, preserving
+	# dst order — `unique` would sort them, destroying order-sensitive arrays
+	# like command-line invocations.
 	local prog='
+		def stable_union($a; $b):
+			reduce $b[] as $item ($a; if any(.[]; . == $item) then . else . + [$item] end);
 		def deepmerge($a; $b; $path):
 			if ($a | type) == "object" and ($b | type) == "object" then
 				( ($a | keys) + ($b | keys) | unique ) as $ks
 				| reduce $ks[] as $k (
 					{merged: {}, conflicts: []};
-					(deepmerge($a[$k] // null; $b[$k] // null; $path + [$k])) as $r
+					(deepmerge(
+						(if $a | has($k) then $a[$k] else null end);
+						(if $b | has($k) then $b[$k] else null end);
+						$path + [$k]
+					)) as $r
 					| .merged[$k] = $r.merged
 					| .conflicts += $r.conflicts
 				)
 			elif ($a | type) == "array" and ($b | type) == "array" then
-				{ merged: ($a + $b | unique), conflicts: [] }
-			elif $a == null then
+				{ merged: stable_union($a; $b), conflicts: [] }
+			elif ($a == null) and ($b != null) then
 				{ merged: $b, conflicts: [] }
-			elif $b == null then
+			elif ($b == null) and ($a != null) then
 				{ merged: $a, conflicts: [] }
 			elif $a == $b then
 				{ merged: $a, conflicts: [] }

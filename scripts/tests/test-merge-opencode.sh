@@ -228,6 +228,57 @@ assert "merged top-level key count is additive (>= max of sides)" \
 # Merged JSON must be valid
 assert "merged JSON parses as valid" "jq -e 'type == \"object\"' '$MERGED' >/dev/null"
 
+# --- Regression: booleans/falsy values must NOT turn into null ---
+# Every `false` at a path in THIS must still be `false` at the same path in
+# MERGED. getpath with JSON-array paths avoids shell quoting issues.
+total_false="$(jq '[paths(type == "boolean" and . == false)] | length' "$THIS")"
+preserved_false="$(jq -n --slurpfile t "$THIS" --slurpfile m "$MERGED" '
+	[$t[0] | paths(type == "boolean" and . == false)] as $ps
+	| [ $ps[] as $p | if ($m[0] | getpath($p)) == false then 1 else 0 end ] | add // 0
+')"
+assert "all $total_false boolean-false values in thisMac survive merge (not null)" \
+	"[[ '$preserved_false' == '$total_false' ]]"
+
+total_true="$(jq '[paths(type == "boolean" and . == true)] | length' "$THIS")"
+preserved_true="$(jq -n --slurpfile t "$THIS" --slurpfile m "$MERGED" '
+	[$t[0] | paths(type == "boolean" and . == true)] as $ps
+	| [ $ps[] as $p | if ($m[0] | getpath($p)) == true then 1 else 0 end ] | add // 0
+')"
+assert "all $total_true boolean-true values in thisMac survive merge" \
+	"[[ '$preserved_true' == '$total_true' ]]"
+
+# Numeric zeros were the other falsy-that-isn't-null trap.
+total_zero="$(jq '[paths(type == "number" and . == 0)] | length' "$THIS")"
+preserved_zero="$(jq -n --slurpfile t "$THIS" --slurpfile m "$MERGED" '
+	[$t[0] | paths(type == "number" and . == 0)] as $ps
+	| [ $ps[] as $p | if ($m[0] | getpath($p)) == 0 then 1 else 0 end ] | add // 0
+')"
+assert "all $total_zero zero-valued numbers in thisMac survive merge" \
+	"[[ '$preserved_zero' == '$total_zero' ]]"
+
+# --- Regression: arrays that should keep order (command invocations) ---
+# sql-formatter.command is identical on both sides — it must round-trip
+# byte-for-byte after merge, not be alphabetically sorted.
+if jq -e '.formatter."sql-formatter".command' "$THIS" >/dev/null 2>&1; then
+	this_cmd="$(jq -c '.formatter."sql-formatter".command' "$THIS")"
+	merged_cmd="$(jq -c '.formatter."sql-formatter".command' "$MERGED")"
+	assert "sql-formatter.command array keeps dst order (no sorting)" \
+		"[[ '$this_cmd' == '$merged_cmd' ]]"
+fi
+
+# If the repo baseline has `mcp.azure.command` (a command invocation) it
+# must also round-trip exactly.
+if jq -e '.mcp.azure.command' "$THIS" >/dev/null 2>&1; then
+	this_az="$(jq -c '.mcp.azure.command' "$THIS")"
+	merged_az="$(jq -c '.mcp.azure.command' "$MERGED")"
+	assert "mcp.azure.command array keeps dst order" \
+		"[[ '$this_az' == '$merged_az' ]]"
+fi
+
+# --- Regression: explicit null stays null; doesn't swallow the other side ---
+# (Covered by the general key-survival asserts above, but make it explicit:
+# a key present only in dst with value null stays present.)
+
 echo
 echo "==> Summary: $pass passed, $fail failed"
 echo "    thisMac:  $THIS"
