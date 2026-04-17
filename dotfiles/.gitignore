@@ -1,0 +1,46 @@
+# ============================================================================
+# SECRETS — never commit these. Sync them via rsync (scripts/04) instead.
+# ============================================================================
+opencode/auth.json
+opencode/**/auth.json
+claude/**/.credentials.json
+claude/**/credentials.json
+claude/**/*.token
+claude/**/*.key
+**/.env
+**/.env.*
+!**/.env.example
+
+# ============================================================================
+# EPHEMERAL / per-machine Claude Code state — don't sync across Macs
+# ============================================================================
+claude/projects/
+claude/todos/
+claude/shell-snapshots/
+claude/statsig/
+claude/ide/
+claude/history.jsonl
+claude/logs/
+claude/caches/
+claude/__store.db*
+
+# ============================================================================
+# Shell history & session state
+# ============================================================================
+shell/.zsh_history
+shell/.bash_history
+shell/.lesshst
+shell/.viminfo
+
+# ============================================================================
+# OS / editor junk
+# ============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+*.swp
+*.swo
+*~
