@@ -35,14 +35,24 @@ trap 'rm -rf "$stage"' EXIT
 if [[ -d "$HOME/.claude" ]]; then
 	echo "==> Staging ~/.claude (excluding ephemeral state and credentials)…"
 	rsync -a \
+		--exclude 'backups/' \
+		--exclude 'cache/' \
+		--exclude 'caches/' \
+		--exclude 'downloads/' \
+		--exclude 'file-history/' \
+		--exclude 'history.jsonl' \
+		--exclude 'ide/' \
+		--exclude 'logs/' \
+		--exclude 'mcp-needs-auth-cache.json' \
+		--exclude 'plugins/' \
+		--exclude 'policy-limits.json' \
 		--exclude 'projects/' \
-		--exclude 'todos/' \
+		--exclude 'session-env/' \
+		--exclude 'sessions/' \
 		--exclude 'shell-snapshots/' \
 		--exclude 'statsig/' \
-		--exclude 'ide/' \
-		--exclude 'history.jsonl' \
-		--exclude 'logs/' \
-		--exclude 'caches/' \
+		--exclude 'telemetry/' \
+		--exclude 'todos/' \
 		--exclude '__store.db*' \
 		--exclude '.credentials.json' \
 		--exclude 'credentials.json' \

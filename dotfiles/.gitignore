@@ -23,14 +23,24 @@ opencode/.gitignore
 # ============================================================================
 # EPHEMERAL / per-machine Claude Code state — don't sync across Macs
 # ============================================================================
+claude/backups/
+claude/cache/
+claude/caches/
+claude/downloads/
+claude/file-history/
+claude/history.jsonl
+claude/ide/
+claude/logs/
+claude/mcp-needs-auth-cache.json
+claude/plugins/
+claude/policy-limits.json
 claude/projects/
-claude/todos/
+claude/session-env/
+claude/sessions/
 claude/shell-snapshots/
 claude/statsig/
-claude/ide/
-claude/history.jsonl
-claude/logs/
-claude/caches/
+claude/telemetry/
+claude/todos/
 claude/__store.db*
 
 # ============================================================================
