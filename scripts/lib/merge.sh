@@ -59,12 +59,11 @@ merge_json() {
 			else
 				{ merged: $b, conflicts: [{path: $path, a: $a, b: $b}] }
 			end;
-		deepmerge($a; $b; [])
+		deepmerge($a[0]; $b[0]; [])
 	'
 
 	local merged_json
-	merged_json="$(jq -n --slurpfile a "$dst" --slurpfile b "$src" \
-		--arg p "" "$prog | . + {a_in: \$a[0], b_in: \$b[0]}" \
+	merged_json="$(jq -n --slurpfile a "$dst" --slurpfile b "$src" "$prog" \
 		| jq -c '.' 2>/dev/null)" || { echo "    jq deep-merge failed"; return 1; }
 
 	# Extract merged tree and conflicts
